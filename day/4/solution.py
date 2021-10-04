@@ -85,34 +85,6 @@ def check_requirements(splitted: list, part: int) -> bool:
     checked_bools.add(REQUIRED_FIELDS.issubset(fields))
     return all(checked_bools)
 
-
-def part1(input: str) -> int:
-    with open(input, "r") as openfile:
-        person_line = ""
-        good = 0
-        while True:
-            line = openfile.readline()
-            if not line or line == "\n":
-                if person_line == "":
-                    break
-                else:
-                    splitted = person_line.split(" ")
-                    fields = set()
-                    for kv in splitted:
-                        if kv:
-                            fields.add(kv[:kv.find(":")])
-                    if REQUIRED_FIELDS.issubset(fields):
-                        good += 1
-                        print("GOOD: ")
-                        print(fields)
-                    else:
-                        print("BAD: ")
-                        print(REQUIRED_FIELDS.difference(fields))
-                    person_line = ""
-            else:
-                person_line = person_line + " " + line.strip()
-        return good
-
 def solve(input: str, part: int) -> int:
     with open(input, "r") as openfile:
         person_line = ""
@@ -132,10 +104,10 @@ def solve(input: str, part: int) -> int:
         return good
 
 if __name__ == "__main__":
-    print(part1(INPUT))
     print(check_hcl("#123abc"))
     print(check_hcl("#123abz"))
     print(check_hcl("123abc"))
     print(check_pid("000000001"))
     print(check_pid("0123456789"))
+    print(solve(INPUT, 1))
     print(solve(INPUT, 2))
