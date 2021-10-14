@@ -1,67 +1,131 @@
 INPUT = "day/8/input"
 
-def solve(input: str):
+def part1(input: str) -> int:
     with open(input, "r") as openfile:
         total = 0
-        positions = []
-        processed_positions = set()
-        current_op = ""
-        current_arg = 0
-        line = openfile.readline()
+        read_lines = []
+        run_lines = set()
+        line_cursor = 0
+        op = ""
+        jmp_arg = 0
         while True:
-            # check line
-            if current_arg == 0 and not line:
-                print(">>>>> BREAK: empty line")
-                break
-            print(f"Seen {line}")
-            
-            # check position
-            position = openfile.tell()
-            if position not in positions:
-                print(f">>>> append position {position}")
-                positions.append(position)
-            elif current_arg == 0 and position in processed_positions:
-                print(">>>>> break: position already processed")
-                print(position, positions, processed_positions)
-                break
-            
-            # check current op to jump lines if necessary
-            if current_arg != 0 and current_op == "jmp":
-                if current_arg > 0:
-                    current_arg -= 1
-                    print(f">>>>> jumping forward 1, remaining {current_arg}")
-                elif current_arg < 0:
-                    seek_position = position_cursor + current_arg - 1
-                    print(
-                        f">>>>> jumping back {current_arg} to position {positions[seek_position]}"
-                    )
-                    openfile.seek(positions[seek_position])
-                    current_arg = 0
-                line = openfile.readline() # should it be here?
+            line = openfile.readline()
 
-            # this now only works for jumping forward
-            # when going backward, the "current line" is not supposed to be processed
-            if current_arg == 0 and line:
-                # process the command
-                op, arg = line.strip().split(" ")
-                current_op = op
+            if not line and jmp_arg == 0:
+                break
+
+            line_end = openfile.tell()
+            if line_end in run_lines and jmp_arg == 0:
+                break
+            if line_end not in read_lines:
+                read_lines.append(line_end)
+            line_cursor = read_lines.index(line_end)
+            
+            if op == "jmp" and jmp_arg != 0:
+                if jmp_arg > 0:
+                    jmp_arg -= 1
+                else:
+                    line_cursor = line_cursor + jmp_arg - 1
+                    openfile.seek(read_lines[line_cursor])
+                    jmp_arg = 0
+            else:
+                op, arg = line.split(" ")
                 if op == "jmp":
-                    current_arg = int(arg)
+                    jmp_arg = int(arg) - 1
+                    run_lines.add(line_end)
                 elif op == "acc":
                     total += int(arg)
-                processed_positions.add(position)
-                position_cursor = positions.index(position)
-                print(f"cursor: {position_cursor}; positions list: {positions}")
-                print(f">>>>> PROCESS {line}")
-
-            # Line reading block
-            # or should it be here?
-            # line should always be read...
-            # if current_arg == 0:
-            #     line = openfile.readline()
-
+                    run_lines.add(line_end)
         return total
 
+def part1_1(input: str) -> int:
+    '''A slightly different take on the solution to part 1;
+    Hopefully to be more understandable
+    '''
+    with open(input, "r") as openfile:
+        total = 0
+        read_lines = []
+        run_lines = set()
+        line_cursor = 0
+        op = ""
+        jmp_arg = 0
+        while True:
+            line = openfile.readline()
 
+            # Loop break conditions
+            if not line:
+                break
+
+            line_end = openfile.tell()
+            if line_end in run_lines and jmp_arg == 0:
+                break
+            if line_end not in read_lines:
+                read_lines.append(line_end)
+            line_cursor = read_lines.index(line_end)
+            
+            if op == "jmp" and jmp_arg > 0:
+                jmp_arg -= 1
+            else:
+                op, arg = line.split(" ")
+                if op == "jmp":
+                    jmp_arg = int(arg)
+                    if int(arg) > 0:
+                        jmp_arg = jmp_arg - 1
+                    elif int(arg) < 0:
+                        line_cursor = line_cursor + jmp_arg - 1
+                        openfile.seek(read_lines[line_cursor])
+                        jmp_arg = 0
+                    run_lines.add(line_end)
+                elif op == "acc":
+                    total += int(arg)
+                    run_lines.add(line_end)
+        return total
+
+def part2(input: str):
+    with open(input, "r") as openfile:
+        total = 0
+        read_lines = []
+        run_lines = set()
+        run_lines_order = []
+        line_cursor = 0
+        op = ""
+        jmp_arg = 0
+        while True:
+            line = openfile.readline().strip()
+            line_end = openfile.tell() # move this up here for end-of-file
+
+            # Loop break conditions
+            if not line:
+                read_lines.append(line_end)
+                break
+
+            if line_end in run_lines and jmp_arg == 0:
+                break
+            if line_end not in read_lines:
+                read_lines.append(line_end)
+            line_cursor = read_lines.index(line_end)
+            
+            if op == "jmp" and jmp_arg > 0:
+                jmp_arg -= 1
+            else:
+                op, arg = line.split(" ")
+                if op == "jmp":
+                    jmp_arg = int(arg)
+                    if int(arg) > 0:
+                        jmp_arg = jmp_arg - 1
+                    elif int(arg) < 0:
+                        line_cursor = line_cursor + jmp_arg - 1
+                        openfile.seek(read_lines[line_cursor])
+                        jmp_arg = 0
+                elif op == "acc":
+                    total += int(arg)
+                # if line_end not in run_lines:
+                run_lines_order.append(((op, arg), line_end))
+                run_lines.add(line_end)
+        
+        return total, run_lines_order, read_lines, read_lines.index(run_lines_order[-1][1])
+    
 if __name__ == "__main__":
-    print(solve(INPUT))
+    # print(part1_1(INPUT))
+    # print(part1(INPUT))
+    print(part2(INPUT))

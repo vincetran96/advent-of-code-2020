@@ -3,4 +3,4 @@ jmp +4
 jmp -1
 jmp -1
 jmp -1
-acc 10
+jmp +1

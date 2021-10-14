@@ -5,26 +5,24 @@
 - Go back some lines (going forward is trivial)
 - Stop when a command line has already been processed
 
-## High-level process:
+## High-level process (see `part1_1`):
 - Prepare (relevant stuff only):
-    - List of lines read
-    - Set of lines processed (no need for ordering so a set is good)
+    - List of `line ends` read
+    - Set of lines run (no need for ordering so a set is good)
+    - Int of line cursor (for going backward)
     - String of current operation
-    - Int of current arg value
-- Read first line
+    - Int of `jump arg` value
 - For each line read (a `while` loop):
-    - Get ending position of the line (`line position`)
-    - Append the position in the list of read lines if not in
-    - Check break condition:
-        - If `line position` in set of lines processed, break
-    - Check if current operation is `jump`
-        - If `jump` forward:
-            - Decrease current arg by 1
-        - If `jump` backward:
-            - Seek the file to the position of the line **before** the desired line (tricky part)
-            - Set current arg to 0
-        - Ignore everything else in the loop
-    - Process the command
+    - Read the line
+    - Loop break conditions:
+        - The end of file: break
+        - `Line end` already run and not `jumping`: break
+        - Append `line end` to list of `line ends` read if not in
+        - Update cursor according to `line end`
+    - If `jumping` forward:
+        - Simply decrease `jump arg` by 1
+    - Else, process the command accordingly, including `jumping` backward
 
 ## Comments
+- Key point of my solution is: **jump forward line-by-line, while jump backward instantly**; simply because reading new lines must be done by every line, while jumping back can be done by seeking
 - My current solution is not elegant
