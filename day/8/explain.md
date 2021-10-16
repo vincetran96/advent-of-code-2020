@@ -29,7 +29,7 @@
 ## Challenges
 - Refrain from reading the whole input
 - Go back some lines
-- Redo by swapping `nop` for `jmp` operations when a loop occurs
+- Redo by swapping `nop` for `jmp` operations or vice versa when a loop occurs
 ## Some reasoning
 - Either an `nop` or `jmp` must be "swapped" for the program to run completely from begin to end without entering an infinite loop
 - Initially, there exists an infinite loop within the program, preventing it from terminating
