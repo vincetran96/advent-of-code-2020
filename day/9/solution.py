@@ -35,16 +35,15 @@ def part2(input: str, preamble_len: int = 5):
                 line = openfile.readline().strip()
                 if not line:
                     break
-                s = int(line)
-                result = [s]
+                candidates = [int(line)]
                 current_start = openfile.tell()
                 while True:
                     next_ = int(openfile.readline().strip())
-                    s += next_
-                    result.append(next_)
-                    if s == target:
-                        return max(result) + min(result)
-                    elif s > target:
+                    candidates.append(next_)
+                    sm = sum(candidates)
+                    if sm == target:
+                        return max(candidates) + min(candidates)
+                    elif sm > target:
                         openfile.seek(current_start)
                         break
                 
