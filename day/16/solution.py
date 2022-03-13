@@ -13,7 +13,7 @@ def check_condition(
     return (input >= cond[0] and input <= cond[1]) \
             or (input >= cond[2] and input <= cond[3])
 
-def part1(input: str) -> tuple:
+def solution(input: str) -> tuple:
     conditions = {} # Dict of conditions names and conditions values
     conditions_order = {} # Dict of correct order of conditions in each ticket line
     valid_tickets = [] # List of valid ticket values
@@ -78,6 +78,7 @@ def part1(input: str) -> tuple:
         unchecked_idx = sorted(list(range(len(conditions.keys()))))
         print(unchecked_idx)
         for ck, cv in conditions.items():
+            conditions_order[ck] = []
             print(f"Checking condition {ck}")
             for idx in unchecked_idx:
                 isCorrect_idx = True
@@ -87,17 +88,18 @@ def part1(input: str) -> tuple:
                         break
                 if isCorrect_idx is True:
                     print(f">> Index {idx} is correct for condition {ck}")
-                    conditions_order[ck] = idx
-                    unchecked_idx.remove(idx) # Not sure if this list is updated within for loop
-                    break
+                    conditions_order[ck].append(idx)
+                    
+                    # unchecked_idx.remove(idx) # Not sure if this list is updated within for loop
+                    # break
             print(f">> {unchecked_idx}")
 
 
                     
-    return result, conditions_order
+    return result, sorted(conditions_order.items(), key=lambda x: x[1])
 
 
 if __name__ == "__main__":
-    print(part1(INPUT_TEST))
-    # print(part1(INPUT))
+    # print(solution(INPUT_TEST))
+    print(solution(INPUT))
     # print(check_condition(35, (30, 260, 284, 950)))
