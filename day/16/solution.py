@@ -19,7 +19,8 @@ def solution(input: str) -> tuple:
     valid_tickets = [] # List of valid ticket values
     nearby = False
     your = False
-    result = 0
+    result_part1 = 0
+    result_part2 = 1
     with open(input, "r") as openfile:
         while True:
             line = openfile.readline()
@@ -66,7 +67,7 @@ def solution(input: str) -> tuple:
                             break
                     # If one ticket value is invalid, the ticket is invalid
                     if isValid_value is False:
-                        result += ticket_value
+                        result_part1 += ticket_value
                         isValid_ticket = False
                 if isValid_ticket is True:
                     valid_tickets.append(ticket_values)
@@ -76,9 +77,8 @@ def solution(input: str) -> tuple:
         
         # Part 2?
         unchecked_idx = sorted(list(range(len(conditions.keys()))))
-        print(unchecked_idx)
         for ck, cv in conditions.items():
-            conditions_order[ck] = []
+            conditions_order[ck] = set()
             print(f"Checking condition {ck}")
             for idx in unchecked_idx:
                 isCorrect_idx = True
@@ -88,15 +88,29 @@ def solution(input: str) -> tuple:
                         break
                 if isCorrect_idx is True:
                     print(f">> Index {idx} is correct for condition {ck}")
-                    conditions_order[ck].append(idx)
+                    conditions_order[ck].add(idx)
                     
                     # unchecked_idx.remove(idx) # Not sure if this list is updated within for loop
                     # break
-            print(f">> {unchecked_idx}")
+            # print(f">> {unchecked_idx}")
+        
+        # Condition names with column indexes that satisfy it
+        sorted_conditions_keys = sorted(conditions_order.items(), key=lambda x: len(x[1]))
+        for i, e in enumerate(sorted_conditions_keys):
+            if len(e[1]) == 1:
+                conditions_order[e[0]] = e[1].pop()
+            else:
+                conditions_order[e[0]] = \
+                    e[1].difference(sorted_conditions_keys[i-1][1]).pop()
+
+        # Now look into your ticket
+        for ck, cv in conditions_order.items():
+            if ck.find("departure") == 0:
+                result_part2 *= your_ticket_values[cv]
 
 
                     
-    return result, sorted(conditions_order.items(), key=lambda x: x[1])
+    return result_part1, result_part2
 
 
 if __name__ == "__main__":
